@@ -53,6 +53,7 @@ class NetworkRoutingSolver:
         t2 = time.time()
         return t2 - t1
 
+    # time complexity - O(n^2)
     def dijkstra(self, src, isBinaryHeap):  # TODO time completities of both implementations
 
         prev = {}  # using dictionaries instead of arrays, allows me to store the name of the node and its distance
@@ -66,19 +67,21 @@ class NetworkRoutingSolver:
             else:
                 dist[node] = math.inf
 
-        if isBinaryHeap:
+        if isBinaryHeap: # determines which type of queue to use
             queue = MyQueue.heapPQ()
         else:
             queue = MyQueue.arrayPQ()
         queue.makeQueue(self.network)
 
-        while len(queue) > 0:
+        # overall complexity - O(n^2)
+        while len(queue) > 0:  # while there's still nodes - O(n)
             curr = queue.deleteMin(dist)
-            for neighbor in curr.neighbors:
+            for neighbor in curr.neighbors: # could be neighbors with each - O(n)
                 # get tentative val
-                tentative_val = dist[curr] + neighbor.length
-                if tentative_val < dist[neighbor.dest]:
+                tentative_val = dist[curr] + neighbor.length # - O(1)
+                if tentative_val < dist[neighbor.dest]:  # - O(1)
                     dist[neighbor.dest] = tentative_val
                     prev[neighbor.dest] = curr
                     queue.decreaseKey()
         return dist, prev
+

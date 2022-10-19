@@ -1,42 +1,84 @@
 #!/usr/bin/python3
-
+import math
 
 from CS312Graph import *
+import MyQueue
 import time
 
 
-class NetworkRoutingSolver:
-    def __init__( self):
-        pass
 
-    def initializeNetwork( self, network ):
-        assert( type(network) == CS312Graph )
+class NetworkRoutingSolver:
+    def __init__(self):
+        self.source = None
+        #self.dest = None
+        self.prev = None
+        self.dist = None
+
+    def initializeNetwork(self, network):
+        assert(type(network) == CS312Graph)
         self.network = network
 
-    def getShortestPath( self, destIndex ):
+
+    # TODO: RETURN THE SHORTEST PATH FOR destIndex using dist and prev from dijks
+    def getShortestPath(self, destIndex):
         self.dest = destIndex
-        # TODO: RETURN THE SHORTEST PATH FOR destIndex
-        #       INSTEAD OF THE DUMMY SET OF EDGES BELOW
-        #       IT'S JUST AN EXAMPLE OF THE FORMAT YOU'LL 
-        #       NEED TO USE
         path_edges = []
         total_length = 0
-        node = self.network.nodes[self.source]
+        #node = self.network.nodes[self.source]
+        node = self.network.nodes[destIndex]
         edges_left = 3
-        while edges_left > 0:
-            edge = node.neighbors[2]
-            path_edges.append( (edge.src.loc, edge.dest.loc, '{:.0f}'.format(edge.length)) )
-            total_length += edge.length
-            node = edge.dest
-            edges_left -= 1
-        return {'cost':total_length, 'path':path_edges}
+        #dummy edges
+        # while edges_left > 0:
+        #     edge = node.neighbors[2]
+        #     path_edges.append( (edge.src.loc, edge.dest.loc, '{:.0f}'.format(edge.length)) )
+        #     total_length += edge.length
+        #     node = edge.dest
+        #     edges_left -= 1
 
-    def computeShortestPaths( self, srcIndex, use_heap=False ):
+        while not node.node_id == self.source:
+            # follow path of prev array add to nodes
+            prevNode = self.prev[node]
+            edge = node.neighbors[prevNode]  #TODO can i reference the neighbor that I want by name in a dic? and i want the prev neighbor
+            path_edges.append((edge.src.loc, edge.dest.loc, '{:.0f}'.format(edge.length)))
+            total_length += edge.length
+            node = self.prev[node]
+
+        return {'cost': total_length, 'path': path_edges}
+
+    # TODO: RUN DIJKSTRA'S TO DETERMINE SHORTEST PATHS.
+    def computeShortestPaths(self, srcIndex, use_heap=False):
         self.source = srcIndex
         t1 = time.time()
-        # TODO: RUN DIJKSTRA'S TO DETERMINE SHORTEST PATHS.
-        #       ALSO, STORE THE RESULTS FOR THE SUBSEQUENT
-        #       CALL TO getShortestPath(dest_index)
+        self.dist, self.prev = self.dijkstra(srcIndex, use_heap)
         t2 = time.time()
-        return (t2-t1)
+        return t2 - t1
 
+    def dijkstra(self, src, isBinaryHeap):
+
+        prev = {}  # using dictionaries instead of arrays, allows me to store the name of the node and its distance
+        dist = {}
+
+        # make all inf
+        for node in self.network.getNodes():  # kinda like appending all of them
+            if node.node_id == src:
+                dist[node] = 0
+                prev[node] = None
+            else:
+                dist[node] = math.inf
+
+        if isBinaryHeap:
+            queue = MyQueue.heapPQ()
+        else:
+            queue = MyQueue.arrayPQ()
+        queue.makeQueue(self.network)
+
+        while len(queue) > 0:
+            curr = queue.deleteMin(dist)
+            for neighbor in curr.neighbors:
+                # get tentative val
+                tentative_val = dist[curr] + neighbor.length
+                if tentative_val < dist[neighbor.dest]:
+                    dist[neighbor.dest] = tentative_val
+                    prev[neighbor.dest] = curr
+                    queue.decreaseKey()
+        return dist, prev

@@ -19,7 +19,7 @@ class NetworkRoutingSolver:
         self.network = network
 
 
-    # TODO: RETURN THE SHORTEST PATH FOR destIndex using dist and prev from dijks
+    # RETURN THE SHORTEST PATH FOR destIndex using dist and prev from dijks
     def getShortestPath(self, destIndex):
         self.dest = destIndex
         path_edges = []
@@ -45,7 +45,7 @@ class NetworkRoutingSolver:
 
         return {'cost': total_length, 'path': path_edges}
 
-    # TODO: RUN DIJKSTRA'S TO DETERMINE SHORTEST PATHS.
+    # RUN DIJKSTRA'S TO DETERMINE SHORTEST PATHS.
     def computeShortestPaths(self, srcIndex, use_heap=False):
         self.source = srcIndex
         t1 = time.time()
@@ -53,7 +53,7 @@ class NetworkRoutingSolver:
         t2 = time.time()
         return t2 - t1
 
-    def dijkstra(self, src, isBinaryHeap):
+    def dijkstra(self, src, isBinaryHeap):  # TODO time completities of both implementations
 
         prev = {}  # using dictionaries instead of arrays, allows me to store the name of the node and its distance
         dist = {}

@@ -56,12 +56,12 @@ class heapPQ(MyQueue):
         self.nodeArrayHeap = [self.insert(node) for node in graph.getNodes()] # TODO does this actually insert correctly?
 
     def add(self, listOfNodes):
-        self.nodeArrayHeap = [self.insert(node) for node in listOfNodes] # TODO this too, also increment the heap size
+        self.nodeArrayHeap = [self.insert(node) for node in listOfNodes] # TODO this too, ^ also how to increment the heap size?
 
-    def deleteMin(self):  # TODO this one just returns min right
+    def deleteMin(self):  # TODO this one just returns min right?
         return self.nodeArrayHeap[0]
 
-    def decreaseKey(self):  # TODO but this one actually removes top node and heapifies
+    def decreaseKey(self):  # TODO but this one actually removes top node and heapifies ?
         self.nodeArrayHeap[0] = self.nodeArrayHeap[self.heapSize -1] # replace with last item
         self.nodeArrayHeap.__delitem__(-1)
         --self.heapSize
@@ -94,7 +94,7 @@ class heapPQ(MyQueue):
                     swapPosition = rightChild
                 else:
                     swapPosition = leftChild
-            else:  # TODO figure this one out, why val not left child
+            else:  # TODO figure this one out, why val not left child? used 'min heap' geeks for geeks code
                 swapPosition = leftChildVal
             if self.nodeArrayHeap[index] > leftChildVal or self.nodeArrayHeap[index] > rightChildVal:
                 self.swap(index, swapPosition)

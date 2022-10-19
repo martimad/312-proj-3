@@ -39,14 +39,14 @@ class NetworkRoutingSolver:
             # follow path of prev array add to nodes
             prevNode = self.prev[node]
             edge = None
-            for n in node.neighbors:
-                if n.src.node_id == prevNode.node_id:
+            for n in prevNode.neighbors:
+                if n.dest.node_id == node.node_id:
                     edge = n
                     break
             # edge = node.neighbors[prevNode]  #TODO can i reference the neighbor that I want by name in a dic? and i want the prev neighbor
             path_edges.append((edge.src.loc, edge.dest.loc, '{:.0f}'.format(edge.length)))
             total_length += edge.length
-            node = self.prev[node]
+            node = prevNode
 
         return {'cost': total_length, 'path': path_edges}
 
@@ -63,11 +63,12 @@ class NetworkRoutingSolver:
 
         prev = {}  # using dictionaries instead of arrays, allows me to store the name of the node and its distance
         dist = {}
-
+        srcNode = None
         # make all inf
         for node in self.network.getNodes():  # kinda like appending all of them
             if node.node_id == src:
                 dist[node] = 0
+                srcNode = node
                 prev[node] = None
             else:
                 dist[node] = math.inf
@@ -77,6 +78,7 @@ class NetworkRoutingSolver:
         else:
             queue = MyQueue.arrayPQ()
         queue.makeQueue(self.network)
+        queue.decreaseKey(srcNode, 0)
 
         # overall complexity - O(n^2)
         while len(queue) > 0:  # while there's still nodes - O(n)

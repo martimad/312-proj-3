@@ -7,10 +7,10 @@ class MyQueue:
     def add(self, listOfNodes):
         pass
 
-    def deleteMin(self):
+    def deleteMin(self, dist):
         pass
 
-    def decreaseKey(self):
+    def decreaseKey(self, node, minVal):
         pass
 
 
@@ -53,16 +53,18 @@ class heapPQ(MyQueue):
         # children - 2n+1  and 2n+2
         # parents - (n-1) // 2
         for node in graph.getNodes():
-            self.insert(node)
+            self.insert(node, math.inf)
 
     def add(self, listOfNodes):
         for node in listOfNodes:
-            self.insert(node)
+            self.insert(node, math.inf)
 
-    def deleteMin(self):  # this one just returns min right and deletes it from queue
+    def deleteMin(self, dist):  # this one just returns min right and deletes it from queue
         minNode = self.nodeArrayHeap[0][0]
         self.nodeArrayHeap[0] = self.nodeArrayHeap[-1]  # replace with last item
-        self.nodeArrayHeap.__delitem__(-1)
+        self.nodeArrayHeap.pop(-1)  # delete the items from the arrays
+        self.indices.pop(minNode)
+        self.indices[self.nodeArrayHeap[0][0]] = 0  # set last ones new index to 0
         self.heapify(0)
         return minNode
 
@@ -72,17 +74,18 @@ class heapPQ(MyQueue):
         self.heapify(index)
 
     def swap(self, first, second):
-        temp = self.nodeArrayHeap[first]
-        tempIndex = self.indices[first]
-        self.nodeArrayHeap[first] = self.nodeArrayHeap[second]
-        self.indices[first] = self.indices[second]
-        self.nodeArrayHeap[second] = temp
-        self.indices[second] = tempIndex
+        firstNode = self.nodeArrayHeap[first]
+        secondNode = self.nodeArrayHeap[second]
+        tempIndex = self.indices[firstNode[0]]
+        self.nodeArrayHeap[first] = secondNode
+        self.indices[firstNode[0]] = self.indices[secondNode[0]]
+        self.nodeArrayHeap[second] = firstNode
+        self.indices[secondNode[0]] = tempIndex
 
     def insert(self, node, dist):
         self.nodeArrayHeap.append((node, dist))
-        self.indices[node] = self.nodeArrayHeap.__sizeof__() - 1
-        current = self.nodeArrayHeap.__sizeof__()
+        self.indices[node] = len(self.nodeArrayHeap) - 1
+        current = len(self.nodeArrayHeap) - 1
         while self.nodeArrayHeap[current][1] < self.nodeArrayHeap[parent(current)][1]:  # while larger than parent
             self.swap(current, parent(current))
             current = parent(current)
@@ -96,7 +99,7 @@ class heapPQ(MyQueue):
             rightChild = (2 * index) + 2
             leftChildVal = self.nodeArrayHeap[leftChild][1]
             rightChildVal = self.nodeArrayHeap[rightChild][1]
-            if rightChild <= self.nodeArrayHeap.__sizeof__():
+            if rightChild <= len(self.nodeArrayHeap):
                 if leftChildVal < rightChildVal:
                     swapPosition = rightChild
                 else:
@@ -108,7 +111,10 @@ class heapPQ(MyQueue):
                 self.heapify(swapPosition)
 
     def isLeaf(self, index):
-        if index > self.nodeArrayHeap.__sizeof__()/2:
+        if index >= (len(self.nodeArrayHeap) - 1) / 2:
             return True
         else:
             return False
+
+    def __len__(self):
+        return len(self.nodeArrayHeap)

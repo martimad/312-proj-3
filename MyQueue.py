@@ -22,7 +22,6 @@ class arrayPQ(MyQueue):
         self.nodeArray = [node for node in graph.getNodes()]   # list comprehention
 
     def add(self, listOfNodes):
-        # for i in listOfNodes:
         self.nodeArray += listOfNodes
 
     def deleteMin(self, dist):
@@ -48,35 +47,43 @@ def parent(current):
 class heapPQ(MyQueue):
     def __init__(self):
         self.nodeArrayHeap = []
-        self.heapSize = 0
+        self.indices = {}
 
     def makeQueue(self, graph):
         # children - 2n+1  and 2n+2
         # parents - (n-1) // 2
-        self.nodeArrayHeap = [self.insert(node) for node in graph.getNodes()] # TODO does this actually insert correctly?
+        for node in graph.getNodes():
+            self.insert(node)
 
     def add(self, listOfNodes):
-        self.nodeArrayHeap = [self.insert(node) for node in listOfNodes] # TODO this too, ^ also how to increment the heap size?
+        for node in listOfNodes:
+            self.insert(node)
 
-    def deleteMin(self):  # TODO this one just returns min right?
-        return self.nodeArrayHeap[0]
-
-    def decreaseKey(self):  # TODO but this one actually removes top node and heapifies ?
-        self.nodeArrayHeap[0] = self.nodeArrayHeap[self.heapSize -1] # replace with last item
+    def deleteMin(self):  # this one just returns min right and deletes it from queue
+        minNode = self.nodeArrayHeap[0][0]
+        self.nodeArrayHeap[0] = self.nodeArrayHeap[-1]  # replace with last item
         self.nodeArrayHeap.__delitem__(-1)
-        --self.heapSize
         self.heapify(0)
+        return minNode
+
+    def decreaseKey(self, node, newVal):  # this heapifies the new updated values
+        index = self.indices[node]
+        self.nodeArrayHeap[index] = (node, newVal)
+        self.heapify(index)
 
     def swap(self, first, second):
         temp = self.nodeArrayHeap[first]
+        tempIndex = self.indices[first]
         self.nodeArrayHeap[first] = self.nodeArrayHeap[second]
+        self.indices[first] = self.indices[second]
         self.nodeArrayHeap[second] = temp
+        self.indices[second] = tempIndex
 
-    def insert(self, node):
-        self.nodeArrayHeap[++self.heapSize] = node
-        current = self.heapSize
-
-        while self.nodeArrayHeap[current] < self.nodeArrayHeap[parent(current)]: #while larger than parent
+    def insert(self, node, dist):
+        self.nodeArrayHeap.append((node, dist))
+        self.indices[node] = self.nodeArrayHeap.__sizeof__() - 1
+        current = self.nodeArrayHeap.__sizeof__()
+        while self.nodeArrayHeap[current][1] < self.nodeArrayHeap[parent(current)][1]:  # while larger than parent
             self.swap(current, parent(current))
             current = parent(current)
 
@@ -85,23 +92,23 @@ class heapPQ(MyQueue):
             # children - 2n+1  and 2n+2
             # parents - (n-1) // 2
             swapPosition = index
-            rightChild = (2 * index) + 1
-            leftChild = (2 * index) + 2
-            rightChildVal = self.nodeArrayHeap[rightChild]
-            leftChildVal = self.nodeArrayHeap[leftChild]
-            if rightChild <= self.heapSize:
+            leftChild = (2 * index) + 1
+            rightChild = (2 * index) + 2
+            leftChildVal = self.nodeArrayHeap[leftChild][1]
+            rightChildVal = self.nodeArrayHeap[rightChild][1]
+            if rightChild <= self.nodeArrayHeap.__sizeof__():
                 if leftChildVal < rightChildVal:
                     swapPosition = rightChild
                 else:
                     swapPosition = leftChild
-            else:  # TODO figure this one out, why val not left child? used 'min heap' geeks for geeks code
-                swapPosition = leftChildVal
-            if self.nodeArrayHeap[index] > leftChildVal or self.nodeArrayHeap[index] > rightChildVal:
+            else:
+                swapPosition = leftChild
+            if self.nodeArrayHeap[index][1] > leftChildVal or self.nodeArrayHeap[index][1] > rightChildVal:
                 self.swap(index, swapPosition)
                 self.heapify(swapPosition)
 
     def isLeaf(self, index):
-        if index > self.heapSize/2:
+        if index > self.nodeArrayHeap.__sizeof__()/2:
             return True
         else:
             return False

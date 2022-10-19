@@ -38,7 +38,12 @@ class NetworkRoutingSolver:
         while not node.node_id == self.source:
             # follow path of prev array add to nodes
             prevNode = self.prev[node]
-            edge = node.neighbors[prevNode]  #TODO can i reference the neighbor that I want by name in a dic? and i want the prev neighbor
+            edge = None
+            for n in node.neighbors:
+                if n.src.node_id == prevNode.node_id:
+                    edge = n
+                    break
+            # edge = node.neighbors[prevNode]  #TODO can i reference the neighbor that I want by name in a dic? and i want the prev neighbor
             path_edges.append((edge.src.loc, edge.dest.loc, '{:.0f}'.format(edge.length)))
             total_length += edge.length
             node = self.prev[node]
@@ -82,6 +87,6 @@ class NetworkRoutingSolver:
                 if tentative_val < dist[neighbor.dest]:  # - O(1)
                     dist[neighbor.dest] = tentative_val
                     prev[neighbor.dest] = curr
-                    queue.decreaseKey()
+                    queue.decreaseKey(neighbor.dest, tentative_val)
         return dist, prev
 

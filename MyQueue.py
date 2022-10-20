@@ -20,7 +20,7 @@ class arrayPQ(MyQueue):
         self.nodeArray = []
 
     def makeQueue(self, graph):
-        self.nodeArray = [node for node in graph.getNodes()]   # list comprehension
+        self.nodeArray = [node for node in graph]   # list comprehension
 
     def add(self, node):
         self.nodeArray.append(node)
@@ -53,7 +53,7 @@ class heapPQ(MyQueue):
     def makeQueue(self, graph):
         # children - 2n+1  and 2n+2
         # parents - (n-1) // 2
-        for node in graph.getNodes():
+        for node in graph:
             self.insert(node, math.inf)
 
     def add(self, listOfNodes):
@@ -73,7 +73,7 @@ class heapPQ(MyQueue):
     def decreaseKey(self, node, newVal):  # this heapifies the new updated values
         if node not in self.indices.keys():
             return
-        index = self.indices[node]
+        index = self.indices[node]  # the index it used to be at
         oldVal = self.nodeArrayHeap[index][1]
         self.nodeArrayHeap[index] = (node, newVal)
         self.bubbleUp(index)
@@ -92,6 +92,8 @@ class heapPQ(MyQueue):
         while self.nodeArrayHeap[index][1] < self.nodeArrayHeap[parent(index)][1]:  # while larger than parent
             self.swap(index, parent(index))
             index = parent(index)
+            if index == 0:
+                break
 
 
     def insert(self, node, dist):

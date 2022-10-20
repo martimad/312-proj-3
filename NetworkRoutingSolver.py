@@ -77,7 +77,7 @@ class NetworkRoutingSolver:
             queue = MyQueue.heapPQ()
         else:
             queue = MyQueue.arrayPQ()
-        queue.makeQueue(self.network)
+        queue.makeQueue(dist)
         queue.decreaseKey(srcNode, 0)
 
         # overall complexity - O(n^2)

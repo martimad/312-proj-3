@@ -4,7 +4,8 @@ import math
 class MyQueue:
     def makeQueue(self, graph):
         pass
-    def add(self, listOfNodes):
+
+    def add(self, node):
         pass
 
     def deleteMin(self, dist):
@@ -19,21 +20,21 @@ class arrayPQ(MyQueue):
         self.nodeArray = []
 
     def makeQueue(self, graph):
-        self.nodeArray = [node for node in graph.getNodes()]   # list comprehention
+        self.nodeArray = [node for node in graph.getNodes()]   # list comprehension
 
-    def add(self, listOfNodes):
-        self.nodeArray += listOfNodes
+    def add(self, node):
+        self.nodeArray.append(node)
 
     def deleteMin(self, dist):
         minVal = math.inf
         minNode = None
-        for i in dist:
-            if i not in self.nodeArray: # if it's not in the priority queue, only want ones we haven't seen
-                continue
-            if dist[i] < minVal:
-                minVal = dist[i]
-                minNode = i  # node name not a num
-        self.nodeArray.remove(minNode)
+        minIndex = 0
+        for i, node in enumerate(self.nodeArray):  # TODO please explain how this works i copied it from a friend
+            if minVal >= dist[node]:
+                minVal = dist[node]
+                minIndex = i
+                minNode = node
+        self.nodeArray.pop(minIndex)
         return minNode
 
     def __len__(self):
@@ -64,14 +65,19 @@ class heapPQ(MyQueue):
         self.nodeArrayHeap[0] = self.nodeArrayHeap[-1]  # replace with last item
         self.nodeArrayHeap.pop(-1)  # delete the items from the arrays
         self.indices.pop(minNode)
-        self.indices[self.nodeArrayHeap[0][0]] = 0  # set last ones new index to 0
-        self.heapify(0)
+        if not len(self.indices) == 0:
+            self.indices[self.nodeArrayHeap[0][0]] = 0  # set last ones new index to 0
+            self.heapify(0)
         return minNode
 
     def decreaseKey(self, node, newVal):  # this heapifies the new updated values
+        if node not in self.indices.keys():
+            return
         index = self.indices[node]
+        oldVal = self.nodeArrayHeap[index][1]
         self.nodeArrayHeap[index] = (node, newVal)
-        self.heapify(index)
+        self.bubbleUp(index)
+        #self.heapify(index)
 
     def swap(self, first, second):
         firstNode = self.nodeArrayHeap[first]
@@ -82,24 +88,33 @@ class heapPQ(MyQueue):
         self.nodeArrayHeap[second] = firstNode
         self.indices[secondNode[0]] = tempIndex
 
+    def bubbleUp(self, index):
+        while self.nodeArrayHeap[index][1] < self.nodeArrayHeap[parent(index)][1]:  # while larger than parent
+            self.swap(index, parent(index))
+            index = parent(index)
+
+
     def insert(self, node, dist):
         self.nodeArrayHeap.append((node, dist))
         self.indices[node] = len(self.nodeArrayHeap) - 1
         current = len(self.nodeArrayHeap) - 1
-        while self.nodeArrayHeap[current][1] < self.nodeArrayHeap[parent(current)][1]:  # while larger than parent
-            self.swap(current, parent(current))
-            current = parent(current)
+        self.bubbleUp(current)
 
     def heapify(self, index):
-        if not self.isLeaf(index):
+        # if not index == 0:  # meaning it's not the top-top node
+        #     while self.nodeArrayHeap[index][1] < self.nodeArrayHeap[parent(index)][1]:  # while smaller than parent
+        #         self.swap(index, parent(index))
+        #         index = parent(index)
+        if not self.isLeaf(index):  # if it's not the top node,and it's bubbled up as high as it needs,then send it down
             # children - 2n+1  and 2n+2
             # parents - (n-1) // 2
             swapPosition = index
             leftChild = (2 * index) + 1
             rightChild = (2 * index) + 2
             leftChildVal = self.nodeArrayHeap[leftChild][1]
-            rightChildVal = self.nodeArrayHeap[rightChild][1]
-            if rightChild <= len(self.nodeArrayHeap):
+            rightChildVal = math.inf
+            if rightChild < len(self.nodeArrayHeap):
+                rightChildVal = self.nodeArrayHeap[rightChild][1]
                 if leftChildVal < rightChildVal:
                     swapPosition = rightChild
                 else:

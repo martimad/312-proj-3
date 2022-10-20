@@ -26,8 +26,8 @@ class NetworkRoutingSolver:
         total_length = 0
         #node = self.network.nodes[self.source]
         node = self.network.nodes[destIndex]
-        edges_left = 3
-        #dummy edges
+        # edges_left = 3
+        # dummy edges
         # while edges_left > 0:
         #     edge = node.neighbors[2]
         #     path_edges.append( (edge.src.loc, edge.dest.loc, '{:.0f}'.format(edge.length)) )
@@ -43,7 +43,6 @@ class NetworkRoutingSolver:
                 if n.dest.node_id == node.node_id:
                     edge = n
                     break
-            # edge = node.neighbors[prevNode]  #TODO can i reference the neighbor that I want by name in a dic? and i want the prev neighbor
             path_edges.append((edge.src.loc, edge.dest.loc, '{:.0f}'.format(edge.length)))
             total_length += edge.length
             node = prevNode
@@ -59,7 +58,7 @@ class NetworkRoutingSolver:
         return t2 - t1
 
     # time complexity - O(n^2)
-    def dijkstra(self, src, isBinaryHeap):  # TODO time completities of both implementations
+    def dijkstra(self, src, isBinaryHeap):
 
         prev = {}  # using dictionaries instead of arrays, allows me to store the name of the node and its distance
         dist = {}
@@ -72,8 +71,9 @@ class NetworkRoutingSolver:
                 prev[node] = None
             else:
                 dist[node] = math.inf
+                prev[node] = None
 
-        if isBinaryHeap: # determines which type of queue to use
+        if isBinaryHeap:  # determines which type of queue to use
             queue = MyQueue.heapPQ()
         else:
             queue = MyQueue.arrayPQ()
@@ -83,9 +83,9 @@ class NetworkRoutingSolver:
         # overall complexity - O(n^2)
         while len(queue) > 0:  # while there's still nodes - O(n)
             curr = queue.deleteMin(dist)
-            for neighbor in curr.neighbors: # could be neighbors with each - O(n)
+            for neighbor in curr.neighbors:  # could be neighbors with each - O(n)
                 # get tentative val
-                tentative_val = dist[curr] + neighbor.length # - O(1)
+                tentative_val = dist[curr] + neighbor.length  # - O(1)
                 if tentative_val < dist[neighbor.dest]:  # - O(1)
                     dist[neighbor.dest] = tentative_val
                     prev[neighbor.dest] = curr

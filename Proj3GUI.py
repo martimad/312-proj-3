@@ -247,7 +247,7 @@ class Proj3GUI( QMainWindow ):
         if array_path:
             cost = array_path['cost']
             for start,end,lbl in array_path['path']:
-                self.view.addEdge(startPt=start, endPt=end, label=lbl, edgeColor=(128,128,255))
+                self.view.addEdge(startPt=start, endPt=end, label=lbl, edgeColor=(255,150,1))
             self.arrayTime.setText('{:.6f}s'.format(array_time))
             if not heap_path:
                 self.heapTime.setText('')
